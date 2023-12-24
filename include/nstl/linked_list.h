@@ -17,6 +17,7 @@ class singly_linked_list {
 public:
     singly_linked_list()
             : m_head(nullptr), m_tail(nullptr), m_size(0) {}
+    // implement this correctly
     singly_linked_list(std::initializer_list<T> values)
             : singly_linked_list() {
         for (auto& value : values)
@@ -36,7 +37,7 @@ public:
 
     T pop() {
         node* curr = m_head;
-        for (int i = 0; i < m_size - 2; ++i)
+        for (int i = 0; i != m_size - 2; ++i)
             curr = curr->next;
         T value = curr->next->value;
         delete curr->next;
@@ -57,15 +58,17 @@ public:
                 newNode->next = m_head;
                 m_head = newNode;
             }
-        } else if (position == m_size) {
-            m_tail->next = newNode;
-            m_tail = newNode;
         } else {
-            node* curr = m_head->next;
-            for (int i = 1; i < position - 1; ++i)
-                curr = curr->next;
-            newNode->next = curr->next;
-            curr->next = newNode;
+            if (position == m_size) {
+                m_tail->next = newNode;
+                m_tail = newNode;
+            } else {
+                node* curr = m_head;
+                for (int i = 0; i != position - 1; ++i)
+                    curr = curr->next;
+                newNode->next = curr->next;
+                curr->next = newNode;
+            }
         }
         ++m_size;
     }
@@ -82,15 +85,9 @@ public:
                 m_head = m_head->next;
                 delete oldHead;
             }
-        } else if (position == m_size - 1) {
-            node* curr = m_head->next;
-            for (int i = 1; i < m_size - 2; ++i)
-                curr = curr->next;
-            delete curr->next;
-            curr->next = nullptr;
         } else {
             node* curr = m_head;
-            for (int i = 0; i < position - 1; ++i)
+            for (int i = 0; i != position - 1; ++i)
                 curr = curr->next;
             node* newNext = curr->next->next;
             delete curr->next;
@@ -190,28 +187,30 @@ public:
                 m_head->prev = newNode;
                 m_head = newNode;
             }
-        } else if (position == m_size) {
-            m_tail->next = newNode;
-            newNode->prev = m_tail;
-            m_tail = newNode;
         } else {
-            if (position >= m_size / 2) {
-                node* curr = m_tail;
-                position = m_size - position - 1;
-                for (int i = 0; i < position - 1; ++i)
-                    curr = curr->prev;
-                curr->prev->next = newNode;
-                newNode->prev = curr->prev;
-                curr->prev = newNode;
-                newNode->next = curr;
+            if (position == m_size) {
+                m_tail->next = newNode;
+                newNode->prev = m_tail;
+                m_tail = newNode;
             } else {
-                node* curr = m_head;
-                for (int i = 0; i < position - 1; ++i)
-                    curr = curr->next;
-                curr->next->prev = newNode;
-                newNode->next = curr->next;
-                curr->next = newNode;
-                newNode->prev = curr;
+                node* curr;
+                if (position >= m_size / 2) {
+                    curr = m_tail;
+                    for (int i = m_size - 1; i != position; --i)
+                        curr = curr->prev;
+                    curr->prev->next = newNode;
+                    newNode->prev = curr->prev;
+                    curr->prev = newNode;
+                    newNode->next = curr;
+                } else {
+                    curr = m_head;
+                    for (int i = 0; i != position - 1; ++i)
+                        curr = curr->next;
+                    curr->next->prev = newNode;
+                    newNode->next = curr->next;
+                    curr->next = newNode;
+                    newNode->prev = curr;
+                }
             }
         }
         ++m_size;
@@ -229,29 +228,31 @@ public:
                 m_head->prev = nullptr;
                 delete oldHead;
             }
-        } else if (position == m_size - 1) {
-            node* newTail = m_tail->prev;
-            newTail->next = nullptr;
-            delete m_tail;
-            m_tail = newTail;
         } else {
-            if (position >= m_size / 2) {
-                node* curr = m_tail;
-                position = m_size - position - 1;
-                for (int i = 0; i < position - 1; ++i)
-                    curr = curr->prev;
-                node* newPrev = curr->prev->prev;
-                newPrev->next = curr;
-                delete curr->prev;
-                curr->prev = newPrev;
+            if (position == m_size - 1) {
+                node* newTail = m_tail->prev;
+                newTail->next = nullptr;
+                delete m_tail;
+                m_tail = newTail;
             } else {
-                node* curr = m_head;
-                for (int i = 0; i < position - 1; ++i)
-                    curr = curr->next;
-                node* newNext = curr->next->next;
-                newNext->prev = curr;
-                delete curr->next;
-                curr->next = newNext;
+                node* curr;
+                if (position >= m_size / 2) {
+                    curr = m_tail;
+                    for (int i = m_size - 1; i != position + 1; --i)
+                        curr = curr->prev;
+                    node* newPrev = curr->prev->prev;
+                    newPrev->next = curr;
+                    delete curr->prev;
+                    curr->prev = newPrev;
+                } else {
+                    curr = m_head;
+                    for (int i = 0; i != position - 1; ++i)
+                        curr = curr->next;
+                    node* newNext = curr->next->next;
+                    newNext->prev = curr;
+                    delete curr->next;
+                    curr->next = newNext;
+                }
             }
         }
         --m_size;
