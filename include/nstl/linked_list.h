@@ -278,8 +278,7 @@ public:
         node* curr;
         if (position >= m_size / 2) {
             curr = m_tail;
-            position = m_size - position;
-            for (int i = 0; i != position; ++i)
+            for (int i = m_size - 1; i != position; --i)
                 curr = curr->prev;
         } else {
             curr = m_head;
